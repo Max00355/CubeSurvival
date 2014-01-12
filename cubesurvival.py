@@ -11,7 +11,7 @@ class zc:
         self.size = (800, 500)
         self.level = 2
         self.kills = 0
-
+        
     def run(self):
         os.environ['SDL_VIDEO_CENTERED'] = '1'
         pygame.init()
@@ -21,6 +21,8 @@ class zc:
         font = pygame.font.SysFont("Arial", 20)
         while True:
             clock.tick(45)
+            if self.kills > 10 * self.level:
+                self.level += 1
             if len(self.enemies) <= 10 * self.level: #Starting position of red cubes around the edge of the map
                 position = {0:"top", 1:"left",2:"right", 3:"bottom"}
                 check = random.randint(0,3)
