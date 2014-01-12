@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
 import random
+import os
 
 class zc:
     def __init__(self):
@@ -12,6 +13,7 @@ class zc:
         self.kills = 0
 
     def run(self):
+        os.environ['SDL_VIDEO_CENTERED'] = '1'
         pygame.init()
         self.screen = pygame.display.set_mode(self.size)
         facing = "up"
@@ -19,7 +21,7 @@ class zc:
         font = pygame.font.SysFont("Arial", 20)
         while True:
             clock.tick(45)
-            if len(self.enemies) <= 10 * self.level:
+            if len(self.enemies) <= 10 * self.level: #Starting position of red cubes around the edge of the map
                 position = {0:"top", 1:"left",2:"right", 3:"bottom"}
                 check = random.randint(0,3)
                 if position[check] == "top":
@@ -36,7 +38,7 @@ class zc:
                     y = random.randint(0, self.size[1])
                 self.enemies.append(pygame.Rect(x,y,25,25))
 
-            for event in pygame.event.get():
+            for event in pygame.event.get(): # Exits when you click the x button
                 if event.type == pygame.QUIT:
                     exit()
 
@@ -44,7 +46,7 @@ class zc:
             if key[K_UP]:
                 facing = "up"
                 self.player[1] -= 10
-                if self.player[1] <= 0:
+                if self.player[1] <= 0: # If on the left most edge of the map prevent the sprite from moving
                     self.player[1] += 10
             elif key[K_DOWN]:
                 facing = "down"
@@ -62,12 +64,12 @@ class zc:
                 if self.player[0] >= self.size[0]-25:
                     self.player[0] -= 10
             elif key[K_SPACE]:
-                self.bullets.append((facing, pygame.Rect(self.player[0], self.player[1], 5, 5)))
+                self.bullets.append((facing, pygame.Rect(self.player[0], self.player[1], 5, 5))) # Add bullets to the bullet list starting from where the player sprite is located
 
             self.screen.fill((255,255,255))
             
             on = 0
-            for x in self.enemies:
+            for x in self.enemies: # Enemies attempt to move to the position of the player sprite
                 player_x = self.player[0]
                 player_y = self.player[1]
                 enemy_x = x[0]
@@ -82,7 +84,7 @@ class zc:
                     enemy_y += 1
                 else:
                     enemy_y -= 1
-                self.enemies[on] = pygame.Rect(enemy_x, enemy_y, 25,25)
+                self.enemies[on] = pygame.Rect(enemy_x, enemy_y, 25,25) # Update the enemy sprites with a new position
                 pygame.draw.rect(self.screen,(255,0,0),x)
                 on += 1
             
@@ -101,20 +103,20 @@ class zc:
                     self.bullets[on] = x
                 except:
                     pass
-                if len(self.bullets) > 15:
+                if len(self.bullets) > 15: # Only allows 15 bullets to be on the surface at a time
                     self.bullets = []
                 pygame.draw.rect(self.screen, (0,0,0), x[1])
                 on += 1
             for x in self.bullets:
                 for y in self.enemies:
-                    if x[1].colliderect(y):
+                    if x[1].colliderect(y): #If a bullet hits an enemy remove that enemy and that bullet then add one to the kills
                         self.enemies.remove(y)
                         self.bullets.remove(x)
                         self.kills += 1
                         break
             
             for x in self.enemies:
-                if self.player.colliderect(x):
+                if self.player.colliderect(x): #If an enemy hits the player close the game
                     print "Game Over!"
                     print "Kills: "+str(self.kills)
                     exit()
